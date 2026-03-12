@@ -1,5 +1,5 @@
 {
-  "name": "booking-api",
+  "name": "hotel-booking-api",
   "module": "index.ts",
   "type": "module",
   "private": true,
