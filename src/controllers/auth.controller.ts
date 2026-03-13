@@ -1,3 +1,4 @@
+import jwt from "jsonwebtoken";
 import type { Request, Response } from "express";
 import { loginSchema, signupSchema } from "../schemas/auth.schema";
 import { errorResponse, successResponse } from "../lib/response";
@@ -32,9 +33,16 @@ export const signup = async (req: Request, res: Response) => {
             }
         });
 
-        successResponse(res, 201, {});
+        const data = {
+            id: user.id,
+            name: user.name,
+            email: user.email,
+            role: user.role,
+            phone: user.phone
+        }
+        return successResponse(res, 201, data);
     } catch (error) {
-        errorResponse(res, 400, "INVALID_REQUEST");
+        return errorResponse(res, 500, "INTERNAL_ERROR");
     }
 };
 
@@ -42,12 +50,49 @@ export const signup = async (req: Request, res: Response) => {
 export const login = async (req: Request, res: Response) => {
     const parsedData = loginSchema.safeParse(req.body);
     if (!parsedData.success) {
-        errorResponse(res, 400, parsedData.error.toString());
+        return errorResponse(res, 400, "INVALID_REQUEST");
     }
 
+    const { email, password } = parsedData.data;
+
     try {
+        const user = await prisma.user.findUnique({
+            where: { email }
+        });
+
+        if (!user) {
+            return errorResponse(res, 401, "INVALID_CREDENTIALS");
+        }
+
+        const isValidPassword = await Bun.password.verify(password, user.password);
+
+        if (!isValidPassword) {
+            return errorResponse(res, 401, "INVALID_CREDENTIALS");
+        }
+
+        const token = jwt.sign(
+            {
+                userId: user.id,
+                role: user.role
+            },
+            Bun.env.JWT_SECRET as string,
+            { expiresIn: "7d" }
+        );
+
+        const data = {
+            token,
+            user: {
+                id: user.id,
+                name: user.name,
+                email: user.email,
+                role: user.role
+            }
+        };
+
+        return successResponse(res, 200, data);
+
 
     } catch (error) {
-
+        return errorResponse(res, 400, "INVALID_REQUEST");
     }
 }
