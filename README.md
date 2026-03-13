@@ -1,4 +1,4 @@
-# booking-api
+# hotel-booking-api
 
 To install dependencies:
 

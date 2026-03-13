@@ -8,13 +8,13 @@ datasource db {
 }
 
 enum Role {
-  CUSTOMER
-  OWNER
+  customer
+  owner
 }
 
 enum Status {
-  CONFIRMED
-  CANCELLED
+  confirmed
+  cancelled
 }
 
 model User {
@@ -23,7 +23,7 @@ model User {
   password  String
   name      String
   phone     String?
-  role      Role      @default(CUSTOMER)
+  role      Role      @default(customer)
   createdAt DateTime  @default(now())
   hotels    Hotel[]
   bookings  Booking[]
@@ -73,7 +73,7 @@ model Booking {
   checkOutDate DateTime
   guests       Int       @default(1)
   totalPrice   Decimal
-  status       Status    @default(CONFIRMED)
+  status       Status    @default(confirmed)
   bookingDate  DateTime  @default(now())
   cancelledAt  DateTime?
   reviews      Review[]
