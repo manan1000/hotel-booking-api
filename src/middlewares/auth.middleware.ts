@@ -4,7 +4,7 @@ import { errorResponse } from "../lib/response";
 import type { Role } from "../../generated/prisma/enums";
 
 
-const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
+export const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
     try {
         const authHeader = req.headers.authorization;
         if (!authHeader) {
